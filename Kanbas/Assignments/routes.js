@@ -1,24 +1,30 @@
 import * as dao from "./dao.js";
 
 export default function AssignmentRoutes(app) {
-  app.get("/api/courses/:courseId/assignments", (req, res) => {
+  app.get("/api/courses/:courseId/assignments", async (req, res) => {
     const { courseId } = req.params;
-    const assignments = dao.findAssignmentsForCourse(courseId);
+    const assignments = await dao.findAssignmentsForCourse(courseId);
     res.json(assignments);
   });
 
-  app.post("/api/courses/:courseId/assignments", (req, res) => {
+  app.post("/api/courses/:courseId/assignments", async (req, res) => {
     const { courseId } = req.params;
-    const assignment = {
+    const assignment = await dao.createAssignment({
       ...req.body,
       course: courseId,
-    };
-    const newAssignment = dao.createAssignment(assignment);
-    res.json(newAssignment);
+    });
+    res.json(assignment);
   });
 
-  app.get("/api/assignments", (req, res) => {
-    const assignments = dao.findAllAssignments();
-    res.json(assignments);
+  app.delete("/api/assignments/:assignmentId", async (req, res) => {
+    const { assignmentId } = req.params;
+    const status = await dao.deleteAssignment(assignmentId);
+    res.json(status);
+  });
+
+  app.put("/api/assignments/:assignmentId", async (req, res) => {
+    const { assignmentId } = req.params;
+    const status = await dao.updateAssignment(assignmentId, req.body);
+    res.json(status);
   });
 }
